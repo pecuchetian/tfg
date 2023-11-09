@@ -15,7 +15,11 @@ CLOSED: [2023-11-09 Thu 11:00]
 
 * Connections
 
+<<<<<<< HEAD
 #+begin_src bash
+=======
+```bash
+>>>>>>> main
 
 # connect to my hetzner instance
 
@@ -26,13 +30,23 @@ ssh pecuchet@***REMOVED*** -i .ssh/id_ed25519
 
 ssh -N -L 8888:***REMOVED***:8888 -L 7474:***REMOVED***:7474 -L 7687:***REMOVED***:7687  ***REMOVED***  -i ~/.ssh/id_ed25519
 
+<<<<<<< HEAD
 #+end_src
+=======
+```
+
+>>>>>>> main
 
 * Python and jupyter
 
 ** Create venv and install jupyter in it
+<<<<<<< HEAD
 #+begin_src bash
   
+=======
+
+```bash
+>>>>>>> main
 
 cd /home/pecuchet/UOC
 
@@ -44,18 +58,31 @@ source tfg-venv/bin/activate
 
 jupyter lab
 
+<<<<<<< HEAD
 #+end_src
 
 
 Have this script ready
 #+begin_src bash
+=======
+
+```
+
+Have this script ready
+
+```
+>>>>>>> main
 #!/bin/bash
 # start_tfg_jupyter
 source /home/pecuchet/UOC/tfg-venv/bin/activate
 
 nohup jupyter lab &
 
+<<<<<<< HEAD
 #+end_src
+=======
+```
+>>>>>>> main
 
 
 
@@ -64,17 +91,32 @@ REMOTE jupyter without ssh tunnel [instructions here](https://dbusteed.github.io
 Access on local machine [http://***REMOVED***:8000/lab](http://***REMOVED***:8000/lab).
 
 ** Create ssh tunnel
+<<<<<<< HEAD
 #+begin_src bash
+=======
+
+```
+>>>>>>> main
 # no cal pel notebook, perquè l'hem fet accessible des d'altres màquines amb usr pw.
 
 ssh -N -L 8888:***REMOVED***:8888 -L  ***REMOVED***  -i ~/.ssh/id_ed25519
 
+<<<<<<< HEAD
 #+end_src
 
 
 * Neo4j
 
 #+begin_src bash
+=======
+
+```
+
+* Neo4j
+
+
+```bash
+>>>>>>> main
 
 # use sudo for restarting neo4j
 
@@ -88,10 +130,18 @@ ssh -N -L 7474:***REMOVED***:7474 -L 7687:***REMOVED***:7687  ***REMOVED***  -i 
 
 # visit on local machine http://localhost:7474/browser/
 
+<<<<<<< HEAD
 #+end_src
 
 ** Data model 
 #+begin_src json
+=======
+```
+
+** Data model 
+
+```json
+>>>>>>> main
 
 User : {
     uri : uri,
@@ -103,4 +153,8 @@ User : {
 
     }
 
+<<<<<<< HEAD
 #+end_src
+=======
+```
+>>>>>>> main
