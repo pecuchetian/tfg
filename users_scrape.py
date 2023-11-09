@@ -1,26 +1,30 @@
-#!/home/pecuchet/Yandex.Disk/UOC/TFG/tfg-venv/bin/python
-
+#!/home/pecuchet/UOC/tfg-venv/bin/python
 from queries import user
 import logging
 import sys
 import  pprint
 from mastodon import Mastodon
 
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
 log = logging.getLogger(__name__)
 
+
+
 u  = user.User('https://mastodon.eugasser.com/@pecuchet')
 
-# u.get_friends()
+u.get_friends()
 
-v = user.User('https://mastodon.social/users/Gargron')
-# v.get_friends()
+#v = user.User('https://mastodont.cat/users/spla')
+#v.get_friends()
 # pprint.pprint(v.following)
-mastodon = Mastodon(
-    api_base_url='https://mastodon.social'
-)
+# mastodon = Mastodon(
+#     api_base_url='https://mastodon.social'
+# )
 
-v.mastodon_fetch_followers()
+# wow nen. edito des de emacs local
+
+# v.mastodon_fetch_followers()
 # mastouser = v.to_mastodon_user()
 # log.debug('Mastouser:%s', mastouser)
 # mastopyuser = mastodon.account_lookup(mastouser)

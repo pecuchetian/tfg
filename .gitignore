@@ -1,1 +1,4 @@
-queries/.env
+.env
+queries/.#*
+.ipynb_checkpoints
+*__pycache__
