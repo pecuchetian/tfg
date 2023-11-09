@@ -1,0 +1,111 @@
+* State of things/ TODOS
+
+**** DONE SOLVE DUPLICATE ENTRIES IN Db
+CLOSED: [2023-11-02 Thu 13:57]
+**** PARALLELIZE [0/4]:
+***** TODO Queue object will be Deque.
+***** TODO Implement some sort of max retries/endless loop control
+***** TODO Implement a done attribute in neo4j as a FINISHED_ON relationship. Create Nodes of type :Timestamp with a timestamp attribute
+****** DONE relationship is (:User)-[SCRAPED_ON]->(:Round) where Round has attributes Round.id = 1, 2, 3 and Round.started_on, Round.finished_on timestamp().
+CLOSED: [2023-11-09 Thu 11:00]
+****** TODO Mark (:User) as scraped when we receive non 200 response or 0 friends. Call verify_friend_count or something.
+****** TODO Here we should have max retries probably.
+**** TODO WARNINGS DON'T SHOW
+
+
+* Connections
+
+```bash
+
+# connect to my hetzner instance
+
+ssh pecuchet@***REMOVED*** -i .ssh/id_ed25519
+
+# connect with neo4j and jupyter tunnels
+
+
+ssh -N -L 8888:***REMOVED***:8888 -L 7474:***REMOVED***:7474 -L 7687:***REMOVED***:7687  ***REMOVED***  -i ~/.ssh/id_ed25519
+
+```
+
+
+* Python and jupyter
+
+** Create venv and install jupyter in it
+
+```bash
+
+cd /home/pecuchet/UOC
+
+python3 -m venv tfg-venv
+
+source tfg-venv/bin/activate
+
+# python3 -m pip install jupyter
+
+jupyter lab
+
+
+```
+
+Have this script ready
+
+```
+#!/bin/bash
+# start_tfg_jupyter
+source /home/pecuchet/UOC/tfg-venv/bin/activate
+
+nohup jupyter lab &
+
+```
+
+
+
+REMOTE jupyter without ssh tunnel [instructions here](https://dbusteed.github.io/setup-jupyter-lab-on-remote-server/ "instructions").
+
+Access on local machine [http://***REMOVED***:8000/lab](http://***REMOVED***:8000/lab).
+
+** Create ssh tunnel
+
+```
+# no cal pel notebook, perquè l'hem fet accessible des d'altres màquines amb usr pw.
+
+ssh -N -L 8888:***REMOVED***:8888 -L  ***REMOVED***  -i ~/.ssh/id_ed25519
+
+
+```
+
+* Neo4j
+
+
+```bash
+
+# use sudo for restarting neo4j
+
+cypher-shell
+
+# usr neo4j pw ***REMOVED***
+
+# ssh tunnel for browser
+
+ssh -N -L 7474:***REMOVED***:7474 -L 7687:***REMOVED***:7687  ***REMOVED***  -i ~/.ssh/id_ed25519
+
+# visit on local machine http://localhost:7474/browser/
+
+```
+
+** Data model 
+
+```json
+
+User : {
+    uri : uri,
+    fwing : {
+        uri,
+        uri,
+        ...
+        }
+
+    }
+
+```
