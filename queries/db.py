@@ -1,7 +1,9 @@
 from neo4j import GraphDatabase, RoutingControl
 from dotenv import load_dotenv
 import os
+import logging
 
+log = logging.getLogger(__name__)
 
 class Db:
 
@@ -10,7 +12,7 @@ class Db:
         api_uri = os.getenv("NEO4J_URI")
         api_usr = os.getenv("NEO4J_USR")
         api_secret = os.getenv("NEO4J_PW")
-        print(api_uri)
+        log.debug(api_uri)
         self.driver = GraphDatabase.driver(api_uri, auth=(api_usr, api_secret))
 
     def close(self):
@@ -64,16 +66,44 @@ class Db:
         return records
 
     def get_unscraped_nodes(self, round):
-        records, _, _ = self.driver.execute_query("""WITH 1 as this_round
-        MATCH (u:User)-[f:SCRAPED_ON]->(r:Round WHERE r.id < $this_round)
-        RETURN u.uri as uri LIMIT 100
-        UNION ALL
-        MATCH (u:User) WHERE NOT (u)-[]->(:Round)
-        RETURN u.uri as uri LIMIT 100""",
+        log.info("ROUND: %s", round)
+        records, _, _ = self.driver.execute_query("""
+                    WITH $this_round as this_round
+                    MATCH (u:User)-[f:SCRAPED_ON]->(r:Round WHERE r.id < this_round)
+                    RETURN u.uri as uri, rand() as r
+                    ORDER  BY r  LIMIT 100
+                    UNION ALL
+                    MATCH (u:User) WHERE NOT (u)-[]->(:Round)
+                    RETURN u.uri as uri, rand() as r 
+                    ORDER BY r LIMIT 100""",
                             this_round=round, database="neo4j", routing_=RoutingControl.READ)
-        return records
         
-
+        return [record['uri'] for record in records]
+        
+    def set_user_round(self, user, round):
+        self.driver.execute_query("MERGE (u:User {uri: $usr})"
+                                  "MERGE (f:Round {id: $rnd})"
+                                  "MERGE (u)-[:SCRAPED_ON]->(f)",
+                                  usr=user,
+                                  rnd=round,
+                                  database_="neo4j")        
+        
+    def set_dead_server(self, server, round):
+        self.driver.execute_query("MERGE (u:Server {url: $url})"
+                                  "MERGE (f:Round {id: $rnd})"
+                                  "MERGE (u)-[:DEAD_ON]->(f)",
+                                  url=server,
+                                  rnd=round,
+                                  database_="neo4j")
+        
+    def set_dead_user(self, user, round):
+        self.driver.execute_query("MERGE (u:User {uri: $url})"
+                                  "MERGE (f:Round {id: $rnd})"
+                                  "MERGE (u)-[r:SCRAPED_ON]->(f)"
+                                  "SET r.usr_status = 'NOT REACHABLE'",
+                                  url=user,
+                                  rnd=round,
+                                  database_="neo4j")        
     @staticmethod
     def _create_and_return_greeting(tx, message):
         result = tx.run("CREATE (a:Greeting) "
