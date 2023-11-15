@@ -30,6 +30,11 @@ def scrape_user(url, round):
     #     
     return u
 
+def declare_user_unreacheable(item, db, round):
+    db = db.Db()
+    db.set_dead_user(item, round)
+    db.close()
+
 class SetQueue(queue.Queue):
     def _init(self, maxsize):
         self.queue = set()
@@ -38,7 +43,7 @@ class SetQueue(queue.Queue):
     def _get(self):
         return self.queue.pop()
 
-def worker(q, lock, currently_scraping, round):
+def worker(q, lock, currently_scraping, db, round):
     while True:
         item = q.get()
         netloc = user.User._get_server(item)
@@ -50,8 +55,12 @@ def worker(q, lock, currently_scraping, round):
             else:
                 currently_scraping.add(netloc)
         log.info('Working on %s', item)
-        scrape_user(item, round)
-        log.info('Finished %s', item)
+        try:
+            scrape_user(item, round)
+            log.info('Finished %s', item)
+        except:
+            declare_user_unreacheable(item, db, round)
+            log.info('Failed %s. Declared unreacheable.', item)
         q.task_done()
         with lock:
             currently_scraping.remove(netloc)
@@ -84,7 +93,7 @@ lock = threading.Lock()
 currently_scraping = set()
 
 for i in range(10):
-    threading.Thread(target=worker, args=(q, lock, currently_scraping, round)).start()
+    threading.Thread(target=worker, args=(q, lock, currently_scraping, db,  round)).start()
 
 threading.Thread(target=supervisor, args=(q, db, currently_scraping, lock, round)).start()
 
