@@ -1,37 +1,29 @@
-* State of things/ TODOS
+* Fediverse social graph
 
-**** DONE SOLVE DUPLICATE ENTRIES IN Db
-CLOSED: [2023-11-02 Thu 13:57]
-**** PARALLELIZE [0/4]:
-***** TODO Queue object will be Deque.
-***** TODO Implement some sort of max retries/endless loop control
-***** TODO Implement a done attribute in neo4j as a FINISHED_ON relationship. Create Nodes of type :Timestamp with a timestamp attribute
-****** DONE relationship is (:User)-[SCRAPED_ON]->(:Round) where Round has attributes Round.id = 1, 2, 3 and Round.started_on, Round.finished_on timestamp().
-CLOSED: [2023-11-09 Thu 11:00]
-****** TODO Mark (:User) as scraped when we receive non 200 response or 0 friends. Call verify_friend_count or something.
-****** TODO Here we should have max retries probably.
-**** TODO WARNINGS DON'T SHOW
+The aim of this project is to create a social graph of fediverse users. It runs on a server and saves follower/following relationships into a Neo4j database.
 
+* Usage
 
-* Connections
+** Connections
 
 #+begin_src bash
 
-# connect to my hetzner instance
 
-ssh pecuchet@***REMOVED*** -i .ssh/id_ed25519
+  # connect to my hetzner instance
 
-# connect with neo4j and jupyter tunnels
+  ssh pecuchet@[your-server-address] -i .ssh/id_ed25519
+
+  # connect with neo4j and jupyter tunnels
 
 
-ssh -N -L 8888:***REMOVED***:8888 -L 7474:***REMOVED***:7474 -L 7687:***REMOVED***:7687  ***REMOVED***  -i ~/.ssh/id_ed25519
+  ssh -N -L 8888:[your-server-address]:8888 -L 7474:[your-server-address]:7474 -L 7687:[your-server-address]:7687  [your-server-address]  -i ~/.ssh/id_ed25519
 
 #+end_src
 
 
-* Python and jupyter
+** Python and jupyter
 
-** Create venv and install jupyter in it
+*** Create venv and install jupyter in it
 #+begin_src bash
 
 
@@ -47,8 +39,8 @@ jupyter lab
 
 #+end_src
 
+Start jupyter like this.
 
-Have this script ready
 #+begin_src bash
 
 Have this script ready
@@ -63,20 +55,12 @@ nohup jupyter lab &
 
 REMOTE jupyter without ssh tunnel [instructions here](https://dbusteed.github.io/setup-jupyter-lab-on-remote-server/ "instructions").
 
-Access on local machine [http://***REMOVED***:8000/lab](http://***REMOVED***:8000/lab).
-
-** Create ssh tunnel
-
-#+begin_src bash
-
-# no cal pel notebook, perquè l'hem fet accessible des d'altres màquines amb usr pw editant el .config de ipython o jupyter
-
-ssh -N -L 8888:***REMOVED***:8888 -L  ***REMOVED***  -i ~/.ssh/id_ed25519
-
-#+end_src
+Access on local machine [http://[your-server-address]:8000/lab](http://[your-server-address]:8000/lab).
 
 
-* Neo4j
+** Neo4j
+
+Access _Neo4j Browser_ on the server with a ssh tunnel with your local machine.
 
 #+begin_src bash
 
@@ -88,24 +72,80 @@ cypher-shell
 
 # ssh tunnel for browser
 
-ssh -N -L 7474:***REMOVED***:7474 -L 7687:***REMOVED***:7687  ***REMOVED***  -i ~/.ssh/id_ed25519
+ssh -N -L 7474:[your-server-address]:7474 -L 7687:[your-server-address]:7687  [your-server-address]  -i ~/.ssh/id_ed25519
 
 # visit on local machine http://localhost:7474/browser/
 
 #+end_src
 
-** Data model 
+*** Data model 
+
+A sample user and server would be:
 
 #+begin_src json
+User: {
+  "identity": 0,
+  "labels": [
+    "User"
+  ],
+  "properties": {
+    "server": "https://mastodon.eugasser.com",
+    "followers": 11,
+    "following": 62,
+    "name": "pecuchet",
+    "uri": "https://mastodon.eugasser.com/users/pecuchet"
+  },
+  "elementId": "0"
+}
 
-User : {
-    uri : uri,
-    fwing : {
-        uri,
-        uri,
-        ...
-        }
-
-    }
+Server : {
+  "identity": 3856,
+  "labels": [
+    "Server"
+  ],
+  "properties": {
+    "url": "https://mastodon.eugasser.com"
+  },
+  "elementId": "3856"
+}
 
 #+end_src
+
+We have the following relationships.
+
+#+begin_src cypher
+
+(:User)-[:FOLLOWS]->(:User)
+
+(:User)-[:IN_COMUNITY]->(:Server)
+
+(:User)-[:SCRAPED_ON]->(:Round)  
+
+#+end_src
+
+
+*** Concurrency/Threading
+
+
+
+
+* State of things/ TODOS
+
+***** DONE SOLVE DUPLICATE ENTRIES IN Db
+CLOSED: [2023-11-02 Thu 13:57]
+***** PARALLELIZE [3/4]:
+****** DONE Queue object is SetQueue. Allows control of duplicates.
+CLOSED: [2023-11-21 Tue 11:34]
+****** DONE Clean users.py and implement mastodon api usage on 401 response on AP endpoint
+CLOSED: [2023-11-21 Tue 11:34]
+****** TODO Implement some sort of max retries/endless loop control
+****** DONE Implement a done attribute in neo4j as a FINISHED_ON relationship. Create Nodes of type :Timestamp with a timestamp attribute
+CLOSED: [2023-11-21 Tue 11:34]
+******* DONE relationship is (:User)-[SCRAPED_ON]->(:Round) where Round has attributes Round.id = 1, 2, 3 and Round.started_on, Round.finished_on timestamp().
+CLOSED: [2023-11-09 Thu 11:00]
+******* DONE Mark (:User) as scraped when we receive non 200 response or 0 friends. Call verify_friend_count or something.
+CLOSED: [2023-11-21 Tue 11:35]
+***** TODO Fix request response bugs
+***** TODO Improve general scrape speed. Consistency of worker thread number.
+***** TODO Neo4j hangs every 24 hours. Find out why and fix.
+
