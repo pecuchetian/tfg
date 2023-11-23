@@ -4,6 +4,10 @@ The aim of this project is to create a social graph of fediverse users. It runs 
 
 * Usage
 
+** Secrets
+
+We use the dotenv Python library with a .env file where sensitive info is stored. This file is included in .gitignore.
+
 ** Connections
 
 #+begin_src bash
