@@ -128,7 +128,9 @@ We have the following relationships.
 #+end_src
 
 
-*** Concurrency/Threading
+*** Neo4j OOM issue
+
+Neo4j service fails (is terminated) by the system every 20h because it eats up all the memory. 
 
 
 
