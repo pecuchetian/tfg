@@ -16,14 +16,20 @@ log = logging.getLogger(__name__)
 
 
 def scrape_user(url, round):
-    u  = user.User(url, round=round)
-    #u.self.mastodon_fetch_friends(fwing_or_fwers)
-    #u.mastodon_fetch_friends('following')
-    
-    #server is not dead
-    u.get_friends()
-    fwingcount_db = u.get_user_degree('following')
-    fwerscount_db = u.get_user_degree('followers')
+    try:
+        u  = user.User(url, round=round)
+    except:
+        log.warning('Could not create user instance %s', url)
+        u.set_round()
+        u.db.close()
+    try:
+        u.get_friends()
+        #fwingcount_db = u.get_user_degree('following')
+        #fwerscount_db = u.get_user_degree('followers')
+    except:
+        log.warning('Could not fetch friends %s', url)
+        u.set_round()
+        u.db.close()
     u.set_round()
     u.db.close()
     # if fwingcount_db >= u.followers_count and fwerscount_db >= u.followers_count:
@@ -92,7 +98,8 @@ q = SetQueue()
 lock = threading.Lock()
 currently_scraping = set()
 
-for i in range(10):
+n_workers = 20
+for i in range(n_workers):
     threading.Thread(target=worker, args=(q, lock, currently_scraping, db,  round)).start()
 
 threading.Thread(target=supervisor, args=(q, db, currently_scraping, lock, round)).start()

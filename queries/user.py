@@ -133,7 +133,8 @@ class User():
                         f = json.loads(r.text)
                         log.debug('Fetching %s',next)
                         next =  f.get('next')
-                        collection += f['orderedItems']
+                        # remove this as it is a waste of memory
+                        #collection += f['orderedItems']
                         self.save_to_db(f['orderedItems'], fwing_or_fwers)
                     elif r.status_code == 429:
                         log.warning('TOO MANY REQUESTS. SLEEPING FOR A MINUTE: %s', next)
