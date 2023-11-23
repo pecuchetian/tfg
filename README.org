@@ -68,7 +68,7 @@ Access _Neo4j Browser_ on the server with a ssh tunnel with your local machine.
 
 cypher-shell
 
-# usr neo4j pw ***REMOVED***
+# usr neo4j pw [password]
 
 # ssh tunnel for browser
 
