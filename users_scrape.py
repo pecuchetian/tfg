@@ -98,6 +98,7 @@ q = SetQueue()
 lock = threading.Lock()
 currently_scraping = set()
 
+
 n_workers = 20
 for i in range(n_workers):
     threading.Thread(target=worker, args=(q, lock, currently_scraping, db,  round)).start()
@@ -105,3 +106,4 @@ for i in range(n_workers):
 threading.Thread(target=supervisor, args=(q, db, currently_scraping, lock, round)).start()
 
 q.join()
+
