@@ -71,11 +71,11 @@ class Db:
                     WITH $this_round as this_round
                     MATCH (u:User)-[f:SCRAPED_ON]->(r:Round WHERE r.id < this_round)
                     RETURN u.uri as uri
-                    ORDER  BY r  LIMIT 100
+                    ORDER  BY r  LIMIT 500
                     UNION ALL
                     MATCH (u:User) WHERE NOT (u)-[]->(:Round)
                     RETURN u.uri as uri
-                    LIMIT 100""",
+                    LIMIT 500""",
                             this_round=round, database="neo4j", routing_=RoutingControl.READ)
         
         return [record['uri'] for record in records]

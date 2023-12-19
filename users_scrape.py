@@ -74,13 +74,13 @@ def worker(q, lock, currently_scraping, db, round):
 def supervisor(q, db, currently_scraping, lock, round):
     while True:
         
-        if q.qsize() < 100:
+        if q.qsize() < 500:
             remaining = populateq(q, db, round)
             with lock:
                 log.info("Supervisor here. Size of queue: %s: .  Number of threads: %s. Active search: %s", q.qsize(), threading.active_count(), currently_scraping)
             if remaining == 0:
                 return
-        sleep(10)            
+        sleep(15)            
             
 def populateq(q, db, round):
     db = db.Db()

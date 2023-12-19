@@ -3,7 +3,7 @@ import requests, json, pprint, time, warnings
 import logging
 from mastodon import Mastodon
 from mastodon.errors import MastodonNotFoundError, MastodonVersionError
-from queries import db
+from queries import db, server
 
 
 log = logging.getLogger(__name__)
@@ -148,18 +148,27 @@ class User():
                 warnings.warn("SKIPPING DOWNLOAD")                
         else:
             warnings.warn("SKIPPING DOWNLOAD: GOT A NON 200 RESPONSE")
+            self.db.set_dead_user(self.uri, self.round)
         return collection
 
     def get_friends(self):
-        if  not self.revert_to_mastodon_api:
+        
+        if  self.is_mastodon():
+            self.mastodon_fetch_friends('followers')
+            self.mastodon_fetch_friends('following')            
+
+        else:
             self.followers = self.get_linked_nodes(self.followers_url)
             self.following = self.get_linked_nodes(self.following_url)
+
+    
+    def is_mastodon(self):
+        s = server.Server(self.server)
+        if s.soft == 'mastodon':
+            return True
         else:
-            log.info('MASTOFETCH')
-
-            self.mastodon_fetch_friends('followers')
-            self.mastodon_fetch_friends('following')
-
+            return False
+            
     def to_mastodon_user(self):
         parsed = urlparse(self.uri)
         #print(parsed)

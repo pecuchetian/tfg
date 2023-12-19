@@ -1,24 +1,30 @@
+from urllib.parse import (urlparse, urlsplit, urljoin, urlunsplit,  urlunparse)
+import requests, json, pprint, time, warnings
+import logging
+
+log = logging.getLogger(__name__)
+
+pp = pprint.PrettyPrinter(indent=3)
+
 class Server:
 
+    endpoint = '/.well-known/nodeinfo'
+    soft = ""
+    
 
-    apis = ['/api/v1/instance?',
-            '/api/v1/nodeinfo?',
-            '/nodeinfo/2.0?',
-            '/nodeinfo/2.0.json?',
-            '/nodeinfo/2.1.json?',
-            '/main/nodeinfo/2.0?',
-            '/api/statusnet/config?',
-            '/api/nodeinfo/2.0.json?',
-            '/api/nodeinfo?',
-            '/wp-json/nodeinfo/2.0?',
-            '/api/v1/instance/nodeinfo/2.0?',
-            '/.well-known/x-nodeinfo2?'
-            ]
-
-    def __init__(self, name) -> None:
-        self.name = name
+    def __init__(self, url) -> None:
+        self.url = url
+        try:
+            self.node_info()
+        except Exception as  e:
+            log.warning('DEAD SERVER', e)
+            self.soft = 'unknown'
 
 
     def node_info(self):
-        ## get node software and such
-        pass
+        r = requests.request(method='GET', url=self.url + self.endpoint)
+        d = json.loads(r.text)
+            
+        r = requests.request(method='GET', url=d['links'][0]['href'])
+        d = json.loads(r.text)
+        self.soft = d['software']['name']
