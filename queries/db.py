@@ -103,7 +103,28 @@ class Db:
                                   "SET r.usr_status = 'NOT REACHABLE'",
                                   url=user,
                                   rnd=round,
-                                  database_="neo4j")        
+                                  database_="neo4j")       
+    def get_deg_centrality(self):
+        self.driver.execute_query("""CALL gds.graph.project(
+                                                          'myGraph',
+                                                          'User',
+                                                          {
+                                                            FOLLOWS: {
+                                                              orientation: 'REVERSE'
+                                                            }
+                                                          }
+                                                        )""",
+                                  database_="neo4j")
+        records, _, _  = self.driver.execute_query("""CALL gds.degree.stream('myGraph')
+                                    YIELD nodeId, score
+                                    RETURN gds.util.asNode(nodeId).uri AS usr, score  AS followers
+                                    ORDER BY followers DESC, usr DESC
+                                    LIMIT 10""",
+                                  database_="neo4j")
+        self.driver.execute_query("""CALL gds.graph.drop('myGraph', false)""",
+                                  database_="neo4j")
+        return [(record['usr'], record['followers']) for record in records]
+        
     @staticmethod
     def _create_and_return_greeting(tx, message):
         result = tx.run("CREATE (a:Greeting) "
