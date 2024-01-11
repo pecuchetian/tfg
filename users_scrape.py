@@ -1,4 +1,3 @@
-
 #!/home/pecuchet/UOC/tfg-venv/bin/python
 import threading
 import queue

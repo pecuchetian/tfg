@@ -124,6 +124,15 @@ class Db:
         self.driver.execute_query("""CALL gds.graph.drop('myGraph', false)""",
                                   database_="neo4j")
         return [(record['usr'], record['followers']) for record in records]
+
+
+    def get_similar_nodes(self, usr_handle):
+        records, _, _ = self.driver.execute_query("""
+        MATCH (u:User {uri: $user_handle})-[f:sim]->(r)
+        RETURN r.uri AS usr,f.score AS score ORDER BY score DESC""",
+                            user_handle=usr_handle, database="neo4j", routing_=RoutingControl.READ)
+        
+        return [(record['usr'], record['score']) for record in records]
         
     @staticmethod
     def _create_and_return_greeting(tx, message):
