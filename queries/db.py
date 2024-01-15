@@ -103,8 +103,63 @@ class Db:
                                   "SET r.usr_status = 'NOT REACHABLE'",
                                   url=user,
                                   rnd=round,
-                                  database_="neo4j")       
+                                  database_="neo4j")
+        
+    def project_users(self):
+        self.driver.execute_query("""CALL gds.graph.drop('myGraph', false)""",
+                                  database_="neo4j")        
+        records, _, _ = self.driver.execute_query("""CALL gds.graph.project(
+                                                          'myGraph',
+                                                          'User',
+                                                          {
+                                                            FOLLOWS: {
+                                                              orientation: 'NATURAL'
+                                                            }
+                                                          }
+                                                        )""",
+                                  database_="neo4j")
+        
+        return records
+        
+    def get_10_deg_cent(self):
+        records, _, _  = self.driver.execute_query("""CALL gds.degree.stream('myGraph',
+                                                                            { orientation: 'REVERSE'}
+                                                                            )
+                                    YIELD nodeId, score
+                                    RETURN gds.util.asNode(nodeId).uri AS usr, score  AS followers
+                                    ORDER BY followers DESC, usr DESC
+                                    LIMIT 10""",
+                                  database_="neo4j")
+        
+        return [(record['usr'], record['followers']) for record in records]
+        
+    def louvain_communitiest(self):
+        records, _, _  = self.driver.execute_query("""CALL gds.louvain.write('myGraph', { writeProperty: 'community' })
+        
+        YIELD communityCount, modularity, modularities""",
+                                  database_="neo4j")
+        
+        return [(record['usr'], record['followers']) for record in records]  
+        
+    def graph_stats(self):
+        records, _, _  = self.driver.execute_query("""CALL gds.graph.list('myGraph')
+YIELD  nodeCount, relationshipCount, density, degreeDistribution
+RETURN  nodeCount, relationshipCount, density, degreeDistribution""",
+                                  database_="neo4j")
+        
+        return [(record['nodeCount'],
+                 record['relationshipCount'],
+                 record['density'],
+                 record['degreeDistribution']) for record in records]  
+        
+    def drop_projection(self):
+        self.driver.execute_query("""CALL gds.graph.drop('myGraph', false)""",
+                                  database_="neo4j")
+
+    
     def get_deg_centrality(self):
+        self.driver.execute_query("""CALL gds.graph.drop('myGraph', false)""",
+                                  database_="neo4j")        
         self.driver.execute_query("""CALL gds.graph.project(
                                                           'myGraph',
                                                           'User',

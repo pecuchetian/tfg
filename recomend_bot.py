@@ -49,7 +49,7 @@ def handle_mention(notification):
         soup = BeautifulSoup(status.content, "html.parser")
         usrs = soup.find_all('a')
         
-        if status.content.find('users like') and usrs[1].get('href'):
+        if status.content.lower().find('users like') and usrs[1].get('href'):
             
             reply_text =  'Hello there!\n'
             reply_text += "Let's try to find users similar to {}.".format(usrs[1].get('href'))
@@ -66,7 +66,7 @@ def handle_mention(notification):
 
         else:
             mastodon.status_post(
-                "Please, if you want me to suggest similar users, please direct message me with text 'users like ' + a fediverse user address.",
+                "If you want me to suggest similar users, please direct message me with text 'users like ' + a fediverse user address.",
                 in_reply_to_id=status.id)
 
            

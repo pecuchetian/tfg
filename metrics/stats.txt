@@ -1,0 +1,11 @@
+https://universeodon.com/users/georgetakei,419755
+https://mastodon.social/users/Gargron,345092
+https://pawoo.net/users/pixiv,303974
+https://mastodon.social/users/neilhimself,267911
+https://masto.ai/users/rbreich,211727
+https://edi.social/users/janboehm,192488
+https://mastodon.social/users/taylorlorenz,178259
+https://mastodon.social/users/Mastodon,172849
+https://mastodon.social/users/arstechnica,139586
+https://mstdn.social/users/stux,133127
+5056827,88216025,3.4497798264643196e-06,{'min': 0, 'max': 67128, 'p90': 30, 'p999': 1035, 'p99': 277, 'p50': 2, 'p75': 8, 'p95': 67, 'mean': 17.444936320740258}
