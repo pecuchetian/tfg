@@ -1,0 +1,27 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: Fediverse social graph
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Marc
+    family-names: Deixt
+    email: mdeixt@uoc.edu
+    affiliation: UOC
+abstract: >-
+  Fediverse social graph is a project aimed at creating a
+  social graph of fediverse users and their
+  following/followers relationships. It is part of the final
+  project in the Applied Data Science degree of Marc Deixt.
+keywords:
+  - networks
+  - graph
+  - scraping
+  - fediverse
+  - neo4j
+  - python
+license: CC-BY-NC-1.0
