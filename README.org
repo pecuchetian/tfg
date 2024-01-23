@@ -1,6 +1,18 @@
 * Fediverse social graph
 
-The aim of this project is to create a social graph of fediverse users. It runs on a server and saves follower/following relationships into a Neo4j database.
+This is the final project for my degree in Applied Data Science. In it, I programmed a scrapper that visits /Fediverse/ users and stores their /followers/ and /following/ collections, if allowed, in a Neo4j graph database.
+
+** User scraper
+
+The scraper [[https://github.com/pecuchetian/tfg/blob/main/users_scrape.py][users_scrape.py]] is installed as a /systemd/ unit and works autonomously, even though it requires frequent restarting. It is multithreaded and makes use of a [[https://github.com/pecuchetian/tfg/blob/main/queries/db.py][Db]] and [[https://github.com/pecuchetian/tfg/blob/main/queries/user.py][User]] classes.
+
+** Data
+
+The data obtained has been stored in a Neo4J database. Some exploratory analysis has been made in [[https://github.com/pecuchetian/tfg/blob/main/GraphQueries.ipynb][GraphQueries.ipynb]].
+
+** Bot
+
+The scripts [[https://github.com/pecuchetian/tfg/blob/main/bot.py][bot.py]] and [[https://github.com/pecuchetian/tfg/blob/main/recomend_bot.py][recomend_bot.py]] update a /Mastodon/ bot account and reply to requests for similar users. Try them at https://mastodon.eugasser.com/@botbot.
 
 * Usage
 
