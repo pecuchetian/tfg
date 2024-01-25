@@ -16,7 +16,7 @@ class Server:
         self.url = url
         try:
             self.node_info()
-        except Exception as  e:
+        except (JSONDecodeError, json.decoder.JSONDecodeError,Exception) as  e:
             log.warning('DEAD SERVER', e)
             self.soft = 'unknown'
 
