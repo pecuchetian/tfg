@@ -145,7 +145,31 @@ We have the following relationships.
 Neo4j service fails (is terminated) by the system every 20h because it eats up all the memory. 
 
 
+* Moving ahead / possible improvements
 
+** Data Model
+
+The relationship =[:SCRAPED_ON]= is useful to track which nodes have been completed, but not for next rounds. If you want to start another scraping round, you need an attribute on the =[:FOLLOWS]= relationship.
+
+** Unscraped nodes query
+
+When getting unscraped from the database the query is too slow:
+
+#+begin_src cypher
+  
+WITH $this_round as this_round
+MATCH (u:User)-[f:SCRAPED_ON]->(r:Round WHERE r.id < this_round)
+RETURN u.uri as uri
+ORDER  BY r  LIMIT 500
+UNION ALL
+MATCH (u:User) WHERE NOT (u)-[]->(:Round)
+RETURN u.uri as uri
+LIMIT 500
+
+  
+#+end_src
+
+Instead of this, try a random walk. Start with a random user with no [:SCRAPED_ON] relationship and query 500 times for users with this condition. Another option would be to project all users with this condition (possibly too slow, but can be done sparingly, just keep the projection for a few times), select randomly and then search for user's uri back in the database.
 
 * State of things/ TODOS
 
@@ -156,7 +180,7 @@ CLOSED: [2023-11-02 Thu 13:57]
 CLOSED: [2023-11-21 Tue 11:34]
 ****** DONE Clean users.py and implement mastodon api usage on 401 response on AP endpoint
 CLOSED: [2023-11-21 Tue 11:34]
-****** TODO Implement some sort of max retries/endless loop control
+****** DONE Implement some sort of max retries/endless loop control
 ****** DONE Implement a done attribute in neo4j as a FINISHED_ON relationship. Create Nodes of type :Timestamp with a timestamp attribute
 CLOSED: [2023-11-21 Tue 11:34]
 ******* DONE relationship is (:User)-[SCRAPED_ON]->(:Round) where Round has attributes Round.id = 1, 2, 3 and Round.started_on, Round.finished_on timestamp().
